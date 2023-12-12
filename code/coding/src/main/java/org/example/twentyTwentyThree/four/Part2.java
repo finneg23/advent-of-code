@@ -10,6 +10,8 @@ public class Part2 {
     public static void main (String[] args) {
         Scanner scanner = getFileAndScan("C:\\Users\\conno\\workspace\\advent-code-challenges\\code\\coding\\src\\main\\java\\org\\example\\resources\\twentyTwentyThree\\four.txt");
         List<String> sheets = new ArrayList<>();
+        List<LotteryCard> lotteryCardList = new ArrayList<>();
+        int gameNum = 0;
         while (scanner.hasNextLine()) {
             sheets.add(scanner.nextLine());
         }
@@ -23,11 +25,11 @@ public class Part2 {
         separateOutToIntLists(separateSheets, winningNums, checkAgainstNums);
 
         for (String str: winningNums) {
-            System.out.println(str);
+            //System.out.println(str);
         }
 
         for (String str: checkAgainstNums) {
-            System.out.println(str);
+            //System.out.println(str);
         }
 
         int sum = 0;
@@ -35,9 +37,37 @@ public class Part2 {
         for (int i = 0; i < checkAgainstNums.size(); i++) {
             int pts = getPts(winningNums, i, checkAgainstNums);
             sum += pts;
+            int counter = 0;
+            //System.out.println(pts);
+            while (pts > 0) {
+                counter++;
+                pts /= 2;
+            }
+            gameNum++;
+            System.out.println(gameNum + " - - - - - " + counter);
+            lotteryCardList.add(new LotteryCard(gameNum, counter));
         }
 
+        int totalCards = calculateTicketTotal(lotteryCardList);
+        System.out.println(totalCards);
         System.out.println(sum);
+    }
+
+    public static int calculateTicketTotal(List<LotteryCard> list) {
+        for (int i = 0; i < list.size(); i++) {
+            LotteryCard card = list.get(i);
+            for (int copies = 0; copies <= card.getNumOfCards(); copies++) {
+                for (int wins = 1; wins <= card.getOriginalWins(); wins++) {
+                    LotteryCard cardToAddWins = list.get(i + wins);
+                    cardToAddWins.setNumOfCards(cardToAddWins.getNumOfCards() + 1);
+                }
+            }
+        }
+        int total = 0;
+        for (LotteryCard card : list) {
+            total += card.getNumOfCards() + 1;
+        }
+        return total;
     }
 
     private static int getPts(List<String> winningNums, int i, List<String> checkAgainstNums) {
